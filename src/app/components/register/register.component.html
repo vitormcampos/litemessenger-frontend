@@ -1,0 +1,52 @@
+<form [formGroup]="registerForm" (ngSubmit)="submit()" class="p-3">
+    <div class="mb-3">
+        <label for="username" class="form-label">Nome de usuario</label>
+        <input type="text" class="form-control" name="username" formControlName="username">
+        @if(registerForm.get('username')?.touched && registerForm.get('username')?.hasError('required')) {
+        <p class="text-danger">
+            Por favor, insira um email válido.
+        </p>
+        }
+        <div id="emailHelp" class="form-text">
+            Não informe esses dados a ninguém.
+        </div>
+    </div>
+    <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" class="form-control" name="email" formControlName="email">
+        @if(registerForm.get('email')?.touched && registerForm.get('email')?.hasError('required')) {
+        <p class="text-danger">
+            Por favor, insira um email válido.
+        </p>
+        }
+        <div id="emailHelp" class="form-text">
+            Não informe esses dados a ninguém.
+        </div>
+    </div>
+    <div class="mb-3">
+        <label for="password" class="form-label">Senha</label>
+        <input type="password" class="form-control" name="password" formControlName="password">
+        @if(registerForm.get('password')?.touched && registerForm.get('password')?.hasError('required')) {
+        <p class="text-danger">
+            Por favor, informe a senha.
+        </p>
+        }
+    </div>
+    <div class="mb-3">
+        <label for="confirmPassword" class="form-label">Confirme a senha</label>
+        <input type="confirmPassword" class="form-control" name="confirmPassword" formControlName="confirmPassword">
+        @if(registerForm.get('confirmPassword')?.touched && (registerForm.get('confirmPassword')?.hasError('required')))
+        {
+        <p class="text-danger">
+            Por favor, confirme a senha.
+        </p>
+        }
+        @if(registerForm.get('confirmPassword')?.touched && (registerForm.hasError('mismatch')))
+        {
+        <p class="text-danger">
+            As senhas não coincidem.
+        </p>
+        }
+    </div>
+    <button type="submit" class="btn btn-secondary">Inscrever-se</button>
+</form>

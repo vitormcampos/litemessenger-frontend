@@ -1,0 +1,24 @@
+<form [formGroup]="loginForm" (ngSubmit)="submit()" class="p-3">
+    <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" class="form-control" name="email" formControlName="email">
+        @if(loginForm.get('email')?.touched && loginForm.get('email')?.hasError('required')) {
+        <p class="text-danger">
+            Por favor, insira um email válido.
+        </p>
+        }
+        <div id="emailHelp" class="form-text">
+            Não informe esses dados a ninguém.
+        </div>
+    </div>
+    <div class="mb-3">
+        <label for="password" class="form-label">Senha</label>
+        <input type="password" class="form-control" name="password" formControlName="password">
+        @if(loginForm.get('password')?.touched && loginForm.get('password')?.hasError('required')) {
+        <p class="text-danger">
+            Por favor, informe a senha.
+        </p>
+        }
+    </div>
+    <button type="submit" class="btn btn-primary">Entrar</button>
+</form>
