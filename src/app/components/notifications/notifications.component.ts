@@ -13,5 +13,5 @@ import { NotificationsService } from '../../stores/notifications/notifications.s
 export class NotificationsComponent {
     private readonly notificationService = inject(NotificationsService);
 
-    notifications$ = this.notificationService.get().pipe(tap(console.log));
+    notifications$ = this.notificationService.get();
 }
