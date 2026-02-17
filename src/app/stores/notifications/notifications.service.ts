@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, timer } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { Notification } from '../../models/notification';
 
 @Injectable({
@@ -8,12 +8,23 @@ import { Notification } from '../../models/notification';
 export class NotificationsService {
     private notifications = new BehaviorSubject<Notification[]>([]);
 
-    add(notification: Notification) {
-        this.notifications.next([notification]);
+    add(notification: Notification): string {
+        const id = crypto.randomUUID();
+        const newNotification = { ...notification, id };
+        
+        const current = this.notifications.value;
+        this.notifications.next([...current, newNotification]);
 
-        timer(5000).subscribe(() => {
-            //this.notifications.next([]);
-        });
+        setTimeout(() => {
+            this.remove(id);
+        }, 5000);
+
+        return id;
+    }
+
+    remove(id: string): void {
+        const current = this.notifications.value;
+        this.notifications.next(current.filter(n => n.id !== id));
     }
 
     get(): Observable<Notification[]> {

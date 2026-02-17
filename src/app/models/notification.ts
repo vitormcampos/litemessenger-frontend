@@ -1,4 +1,5 @@
-export class Notification {
-	message?: string;
-	type?: string;
+export interface Notification {
+    id?: string;
+    message?: string;
+    type?: 'success' | 'danger' | 'warning' | 'info';
 }

@@ -5,12 +5,14 @@ import {
     HubConnection,
     HttpTransportType,
 } from '@microsoft/signalr';
+import { CookieService } from '../cookie/cookie.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class ChatService {
     private readonly platformId = inject(PLATFORM_ID);
+    private readonly cookieService = inject(CookieService);
 
     private readonly chatUrl = import.meta.env.NG_APP_WS_URL + '/chats';
 
@@ -22,7 +24,7 @@ export class ChatService {
         const connection = new HubConnectionBuilder()
             .withUrl(this.chatUrl, {
                 accessTokenFactory: () => {
-                    return localStorage.getItem('token') ?? '';
+                    return this.cookieService.get('token') ?? '';
                 },
                 transport: HttpTransportType.WebSockets,
             })

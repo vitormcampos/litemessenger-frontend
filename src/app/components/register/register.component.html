@@ -1,52 +1,97 @@
-<form [formGroup]="registerForm" (ngSubmit)="submit()" class="p-3">
-    <div class="mb-3">
-        <label for="username" class="form-label">Nome de usuario</label>
-        <input type="text" class="form-control" name="username" formControlName="username">
-        @if(registerForm.get('username')?.touched && registerForm.get('username')?.hasError('required')) {
-        <p class="text-danger">
-            Por favor, insira um email válido.
-        </p>
-        }
-        <div id="emailHelp" class="form-text">
-            Não informe esses dados a ninguém.
+<div class="login-container">
+    <div class="login-bg-pattern"></div>
+    
+    <div class="login-card glass">
+        <div class="login-header">
+            <div class="msn-logo">
+                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="24" cy="24" r="22" fill="url(#msnGradient2)"/>
+                    <path d="M14 32V16L24 12L34 16V32L24 36L14 32Z" fill="white" opacity="0.9"/>
+                    <path d="M14 16L24 20L34 16" stroke="white" stroke-width="2" opacity="0.7"/>
+                    <circle cx="24" cy="26" r="6" fill="white" opacity="0.3"/>
+                    <defs>
+                        <linearGradient id="msnGradient2" x1="0" y1="0" x2="48" y2="48">
+                            <stop stop-color="#00A1E4"/>
+                            <stop offset="1" stop-color="#0078D4"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+            <h1>Criar Conta</h1>
+            <p>Junte-se ao Lite Messenger!</p>
+        </div>
+
+        <form [formGroup]="registerForm" (ngSubmit)="submit()" class="login-form">
+            <div class="form-group">
+                <label for="username">Nome de usuário</label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    class="form-control" 
+                    name="username" 
+                    formControlName="username"
+                    placeholder="seuusername"
+                >
+                @if(registerForm.get('username')?.touched && registerForm.get('username')?.hasError('required')) {
+                    <span class="error-message">Nome de usuário é obrigatório</span>
+                }
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    class="form-control" 
+                    name="email" 
+                    formControlName="email"
+                    placeholder="seu@email.com"
+                >
+                @if(registerForm.get('email')?.touched && registerForm.get('email')?.hasError('required')) {
+                    <span class="error-message">Email é obrigatório</span>
+                }
+            </div>
+
+            <div class="form-group">
+                <label for="password">Senha</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    class="form-control" 
+                    name="password" 
+                    formControlName="password"
+                    placeholder="••••••••"
+                >
+                @if(registerForm.get('password')?.touched && registerForm.get('password')?.hasError('required')) {
+                    <span class="error-message">Senha é obrigatória</span>
+                }
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">Confirmar Senha</label>
+                <input 
+                    type="password" 
+                    id="confirmPassword" 
+                    class="form-control" 
+                    name="confirmPassword" 
+                    formControlName="confirmPassword"
+                    placeholder="••••••••"
+                >
+                @if(registerForm.get('confirmPassword')?.touched && registerForm.get('confirmPassword')?.hasError('required')) {
+                    <span class="error-message">Confirmação de senha é obrigatória</span>
+                }
+                @if(registerForm.get('confirmPassword')?.touched && registerForm.hasError('mismatch')) {
+                    <span class="error-message">As senhas não coincidem</span>
+                }
+            </div>
+
+            <button type="submit" class="btn-primary login-btn" [disabled]="registerForm.invalid">
+                Criar Conta
+            </button>
+        </form>
+
+        <div class="login-footer">
+            <p>Já tem uma conta? <a routerLink="/login">Entrar</a></p>
         </div>
     </div>
-    <div class="mb-3">
-        <label for="email" class="form-label">Email</label>
-        <input type="email" class="form-control" name="email" formControlName="email">
-        @if(registerForm.get('email')?.touched && registerForm.get('email')?.hasError('required')) {
-        <p class="text-danger">
-            Por favor, insira um email válido.
-        </p>
-        }
-        <div id="emailHelp" class="form-text">
-            Não informe esses dados a ninguém.
-        </div>
-    </div>
-    <div class="mb-3">
-        <label for="password" class="form-label">Senha</label>
-        <input type="password" class="form-control" name="password" formControlName="password">
-        @if(registerForm.get('password')?.touched && registerForm.get('password')?.hasError('required')) {
-        <p class="text-danger">
-            Por favor, informe a senha.
-        </p>
-        }
-    </div>
-    <div class="mb-3">
-        <label for="confirmPassword" class="form-label">Confirme a senha</label>
-        <input type="confirmPassword" class="form-control" name="confirmPassword" formControlName="confirmPassword">
-        @if(registerForm.get('confirmPassword')?.touched && (registerForm.get('confirmPassword')?.hasError('required')))
-        {
-        <p class="text-danger">
-            Por favor, confirme a senha.
-        </p>
-        }
-        @if(registerForm.get('confirmPassword')?.touched && (registerForm.hasError('mismatch')))
-        {
-        <p class="text-danger">
-            As senhas não coincidem.
-        </p>
-        }
-    </div>
-    <button type="submit" class="btn btn-secondary">Inscrever-se</button>
-</form>
+</div>

@@ -1,5 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
+import { User } from "../../models/user";
 
 @Injectable({
 	providedIn: "root",
@@ -31,5 +32,9 @@ export class AuthService {
 			password,
 			confirmPassword,
 		});
+	}
+
+	getCurrentUser() {
+		return this.httpClient.get<User>(`${this.authUrl}/me`);
 	}
 }

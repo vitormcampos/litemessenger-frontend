@@ -1,0 +1,29 @@
+<aside class="sidebar">
+    <div class="user-profile">
+        <div class="avatar">
+            {{ username().charAt(0).toUpperCase() }}
+        </div>
+        <div class="user-info">
+            <span class="username">{{ username() }}</span>
+            <span class="status">Online</span>
+        </div>
+    </div>
+
+    <div class="users-list">
+        <h3>Usuários Online</h3>
+        @if (loggedInUsers().length === 0) {
+            <p class="no-users">Nenhum usuário online</p>
+        } @else {
+            <ul>
+                @for (user of loggedInUsers(); track user.id) {
+                    <li class="user-item">
+                        <div class="user-avatar">
+                            {{ (user.username || '').charAt(0).toUpperCase() }}
+                        </div>
+                        <span class="user-name">{{ user.username }}</span>
+                    </li>
+                }
+            </ul>
+        }
+    </div>
+</aside>

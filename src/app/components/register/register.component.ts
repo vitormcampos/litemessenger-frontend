@@ -1,11 +1,12 @@
 import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth/auth.service';
 import { NotificationsService } from '../../stores/notifications/notifications.service';
 
 @Component({
     selector: 'app-register',
-    imports: [ReactiveFormsModule],
+    imports: [ReactiveFormsModule, RouterModule],
     templateUrl: './register.component.html',
     styleUrl: './register.component.css',
 })
@@ -13,12 +14,13 @@ export class RegisterComponent {
     private readonly formBuilder = inject(FormBuilder);
     private readonly authService = inject(AuthService);
     private readonly notificationService = inject(NotificationsService);
+    private readonly router = inject(Router);
 
     registerForm = this.formBuilder.group(
         {
             username: ['', [Validators.required]],
-            email: ['', Validators.required, Validators.email],
-            password: ['', Validators.required],
+            email: ['', [Validators.required, Validators.email]],
+            password: ['', [Validators.required, Validators.minLength(6)]],
             confirmPassword: ['', Validators.required],
         },
         {
@@ -35,7 +37,7 @@ export class RegisterComponent {
 
     submit() {
         if (this.registerForm.invalid) {
-            console.warn('Form is invalid', this.registerForm.errors);
+            this.registerForm.markAllAsTouched();
             return;
         }
 
@@ -45,13 +47,14 @@ export class RegisterComponent {
         this.authService
             .register(username!, email!, password!, confirmPassword!)
             .subscribe({
-                next: (response) => {
+                next: () => {
                     this.notificationService.add({
                         type: 'success',
                         message: 'Cadastro realizado com sucesso!',
                     });
+                    this.router.navigate(['/login']);
                 },
-                error: (error) => {
+                error: () => {
                     this.notificationService.add({
                         type: 'danger',
                         message: 'Erro ao realizar o cadastro!',

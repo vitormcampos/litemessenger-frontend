@@ -1,10 +1,12 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
+import { CookieService } from '../services/cookie/cookie.service';
 
 export const authGuard: CanActivateFn = (route, state) => {
     const router = inject(Router);
+    const cookieService = inject(CookieService);
 
-    if (isLoggedIn()) {
+    if (isLoggedIn(cookieService)) {
         return true;
     }
 
@@ -12,6 +14,6 @@ export const authGuard: CanActivateFn = (route, state) => {
     return false;
 };
 
-const isLoggedIn = () => {
-    return !!localStorage.getItem('token');
+const isLoggedIn = (cookieService: CookieService) => {
+    return !!cookieService.get('token');
 };

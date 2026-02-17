@@ -1,0 +1,125 @@
+.notification-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 380px;
+}
+
+.notification-item {
+    padding: 16px 20px;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border-left: 4px solid transparent;
+}
+
+.notification-item:hover {
+    transform: translateX(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.notification-item.success {
+    background: white;
+    border-left-color: var(--msn-green);
+}
+
+.notification-item.danger {
+    background: white;
+    border-left-color: var(--msn-red);
+}
+
+.notification-item.warning {
+    background: white;
+    border-left-color: var(--msn-gold);
+}
+
+.notification-item.info {
+    background: white;
+    border-left-color: var(--msn-blue);
+}
+
+.notification-icon {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.notification-item.success .notification-icon {
+    background: rgba(130, 188, 0, 0.15);
+    color: var(--msn-green);
+}
+
+.notification-item.danger .notification-icon {
+    background: rgba(232, 17, 35, 0.15);
+    color: var(--msn-red);
+}
+
+.notification-item.warning .notification-icon {
+    background: rgba(255, 185, 0, 0.15);
+    color: var(--msn-gold);
+}
+
+.notification-item.info .notification-icon {
+    background: rgba(0, 161, 228, 0.15);
+    color: var(--msn-blue);
+}
+
+.notification-icon svg {
+    width: 16px;
+    height: 16px;
+}
+
+.notification-message {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.notification-close {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 50%;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.notification-close:hover {
+    background: var(--msn-aero);
+    color: var(--text-primary);
+}
+
+.notification-close svg {
+    width: 16px;
+    height: 16px;
+}

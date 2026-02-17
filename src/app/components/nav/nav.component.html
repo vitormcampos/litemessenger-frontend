@@ -2,13 +2,26 @@
     <div class="container-fluid">
         <a
             role="button"
-            class="navbar-brand h1 cursor-pointer"
-            [routerLink]="'/'"
-            >Lite Messenger</a
+            class="navbar-brand"
+            [routerLink]="'/social'"
         >
-        <a class="btn btn-primary" [routerLink]="'/auth'">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="24" cy="24" r="22" fill="url(#msnGradientNav)"/>
+                <path d="M14 32V16L24 12L34 16V32L24 36L14 32Z" fill="white" opacity="0.9"/>
+                <path d="M14 16L24 20L34 16" stroke="white" stroke-width="2" opacity="0.7"/>
+                <circle cx="24" cy="26" r="6" fill="white" opacity="0.3"/>
+                <defs>
+                    <linearGradient id="msnGradientNav" x1="0" y1="0" x2="48" y2="48">
+                        <stop stop-color="#00A1E4"/>
+                        <stop offset="1" stop-color="#0078D4"/>
+                    </linearGradient>
+                </defs>
+            </svg>
+            Lite Messenger
+        </a>
+        <a class="btn btn-primary" [routerLink]="'/login'">
             <lucide-icon [img]="LoginIcon"></lucide-icon>
-            Começe já</a
-        >
+            Começar
+        </a>
     </div>
 </nav>
