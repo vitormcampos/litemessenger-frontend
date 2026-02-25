@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { userStore } from '../../stores/user/user.store';
+import { UserStore } from '../../stores/user/user.store';
 
 @Component({
     selector: 'app-sidebar',
@@ -10,7 +10,9 @@ import { userStore } from '../../stores/user/user.store';
     styleUrl: './sidebar.component.css',
 })
 export class SidebarComponent {
-    readonly currentUser = userStore.currentUser;
-    readonly username = userStore.username;
-    readonly loggedInUsers = userStore.loggedInUsers;
+    private readonly userStore = inject(UserStore);
+
+    readonly currentUser = this.userStore.currentUser;
+    readonly username = this.userStore.username;
+    readonly loggedInUsers = this.userStore.loggedInUsers;
 }

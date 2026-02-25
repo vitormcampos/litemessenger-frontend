@@ -1,7 +1,8 @@
-import { signal, computed } from '@angular/core';
+import { signal, computed, Inject, Injectable } from '@angular/core';
 import { User } from '../../models/user';
 
-class UserStore {
+@Injectable({ providedIn: 'root' })
+export class UserStore {
     readonly currentUser = signal<User | null>(null);
     readonly loggedInUsers = signal<User[]>([]);
 
@@ -30,5 +31,3 @@ class UserStore {
         this.currentUser.set(null);
     }
 }
-
-export const userStore = new UserStore();

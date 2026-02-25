@@ -4,7 +4,8 @@ import { Router, RouterModule } from '@angular/router';
 
 import { AuthService } from '../../services/auth/auth.service';
 import { CookieService } from '../../services/cookie/cookie.service';
-import { userStore } from '../../stores/user/user.store';
+import { UserStore } from '../../stores/user/user.store';
+import { AUTH_KEY } from '../../interceptors/auth.interceptor';
 
 @Component({
     selector: 'app-login',
@@ -15,6 +16,7 @@ import { userStore } from '../../stores/user/user.store';
 export class LoginComponent {
     private readonly formBuilder = inject(FormBuilder);
     private readonly authService = inject(AuthService);
+    private readonly userStore = inject(UserStore);
     private readonly cookieService = inject(CookieService);
     private readonly router = inject(Router);
 
@@ -33,20 +35,8 @@ export class LoginComponent {
 
         this.authService.login(email!, password!).subscribe({
             next: (response) => {
-                this.cookieService.set('token', response);
-                this.authService.getCurrentUser().subscribe({
-                    next: (user) => {
-                        userStore.setCurrentUser({
-                            id: user.id,
-                            username: user.name,
-                            email: user.email,
-                        });
-                        this.router.navigate(['/social']);
-                    },
-                    error: () => {
-                        this.router.navigate(['/social']);
-                    },
-                });
+                this.cookieService.set(AUTH_KEY, response);
+                this.router.navigate(['/social']);
             },
             error: () => {
                 alert('Credenciais inválidas. Tente novamente.');

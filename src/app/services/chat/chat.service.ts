@@ -1,4 +1,4 @@
-import { isPlatformBrowser } from '@angular/common';
+import { isPlatformServer } from '@angular/common';
 import { inject, Injectable, PLATFORM_ID } from '@angular/core';
 import {
     HubConnectionBuilder,
@@ -6,6 +6,7 @@ import {
     HttpTransportType,
 } from '@microsoft/signalr';
 import { CookieService } from '../cookie/cookie.service';
+import { AUTH_KEY } from '../../interceptors/auth.interceptor';
 
 @Injectable({
     providedIn: 'root',
@@ -17,16 +18,17 @@ export class ChatService {
     private readonly chatUrl = import.meta.env.NG_APP_WS_URL + '/chats';
 
     constructor() {
-        if (!isPlatformBrowser(this.platformId)) {
+        if (isPlatformServer(this.platformId)) {
             return;
         }
 
         const connection = new HubConnectionBuilder()
             .withUrl(this.chatUrl, {
                 accessTokenFactory: () => {
-                    return this.cookieService.get('token') ?? '';
+                    return this.cookieService.get(AUTH_KEY) ?? '';
                 },
                 transport: HttpTransportType.WebSockets,
+                skipNegotiation: true,
             })
             .configureLogging('debug')
             .withAutomaticReconnect()
