@@ -7,6 +7,7 @@ import {
 } from '@microsoft/signalr';
 import { CookieService } from '../cookie/cookie.service';
 import { AUTH_KEY } from '../../interceptors/auth.interceptor';
+import { UserStore } from '../../stores/user/user.store';
 
 @Injectable({
     providedIn: 'root',
@@ -14,6 +15,7 @@ import { AUTH_KEY } from '../../interceptors/auth.interceptor';
 export class ChatService {
     private readonly platformId = inject(PLATFORM_ID);
     private readonly cookieService = inject(CookieService);
+    private readonly userStore = inject(UserStore);
 
     private readonly chatUrl = import.meta.env.NG_APP_WS_URL + '/chats';
 
@@ -30,7 +32,6 @@ export class ChatService {
                 transport: HttpTransportType.WebSockets,
                 skipNegotiation: true,
             })
-            .configureLogging('debug')
             .withAutomaticReconnect()
             .build();
 
@@ -51,5 +52,9 @@ export class ChatService {
             .send('sendMessage', 'ola mundo', 'ola mundo resposta')
             .then(console.log);
         connection.on('receiveMessage', console.log);
+
+        connection.on('updateOnlineUsers', (users) => {
+            this.userStore.setLoggedInUsers(users);
+        });
     }
 }

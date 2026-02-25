@@ -11,21 +11,4 @@ import { UserStore } from '../../stores/user/user.store';
     templateUrl: './social.component.html',
     styleUrl: './social.component.css',
 })
-export class SocialComponent implements OnInit {
-    private readonly chatService = inject(ChatService);
-    private readonly authService = inject(AuthService);
-    private readonly userStore = inject(UserStore);
-
-    ngOnInit() {
-        this.authService.getCurrentUser().subscribe({
-            next: (user) => {
-                this.userStore.setCurrentUser({
-                    id: user.id,
-                    username: user.name,
-                    email: user.email,
-                });
-            },
-            error: () => {},
-        });
-    }
-}
+export class SocialComponent {}

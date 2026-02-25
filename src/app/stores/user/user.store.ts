@@ -1,4 +1,4 @@
-import { signal, computed, Inject, Injectable } from '@angular/core';
+import { signal, computed, Injectable } from '@angular/core';
 import { User } from '../../models/user';
 
 @Injectable({ providedIn: 'root' })
@@ -7,24 +7,15 @@ export class UserStore {
     readonly loggedInUsers = signal<User[]>([]);
 
     readonly isLoggedIn = computed(() => this.currentUser() !== null);
-    readonly username = computed(() => this.currentUser()?.username ?? '');
+    readonly username = computed(() => this.currentUser()?.name ?? '');
 
     setCurrentUser(user: User | null) {
         this.currentUser.set(user);
     }
 
     setLoggedInUsers(users: User[]) {
-        this.loggedInUsers.set(users);
-    }
-
-    addLoggedInUser(user: User) {
-        this.loggedInUsers.update((users) => [...users, user]);
-    }
-
-    removeLoggedInUser(userId: string) {
-        this.loggedInUsers.update((users) =>
-            users.filter((u) => u.id !== userId)
-        );
+        const otherUsers = users.filter((u) => u.id !== this.currentUser()?.id);
+        this.loggedInUsers.set([...otherUsers]);
     }
 
     logout() {
