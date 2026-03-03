@@ -15,10 +15,12 @@
             <ul>
                 @for (user of onlineUsers(); track user.id) {
                     <li class="user-item">
-                        <div class="user-avatar">
-                            {{ (user.name || '').charAt(0).toUpperCase() }}
-                        </div>
-                        <span class="user-name">{{ user.name }}</span>
+                        <a routerLink="/chat/{{ user.id }}">
+                            <div class="user-avatar">
+                                {{ (user.name || '').charAt(0).toUpperCase() }}
+                            </div>
+                            <span class="user-name">{{ user.name }}</span>
+                        </a>
                     </li>
                 }
             </ul>

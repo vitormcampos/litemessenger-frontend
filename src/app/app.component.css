@@ -1,0 +1,23 @@
+.social-container {
+    display: flex;
+    height: 100vh;
+}
+
+.social-content {
+    flex: 1;
+    padding: 32px;
+    background: var(--bg-primary);
+    overflow-y: auto;
+}
+
+.social-content h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.social-content p {
+    color: var(--text-secondary);
+    font-size: 14px;
+}
