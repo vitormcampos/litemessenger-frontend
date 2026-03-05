@@ -1,43 +1,62 @@
-import { isPlatformServer } from '@angular/common';
-import { inject, Injectable, PLATFORM_ID } from '@angular/core';
-import {
-    HubConnectionBuilder,
-    HubConnection,
-    HttpTransportType,
-} from '@microsoft/signalr';
-import { CookieService } from '../cookie/cookie.service';
-import { AUTH_KEY } from '../../interceptors/auth.interceptor';
-import { UserStore } from '../../stores/user/user.store';
 import { HttpClient } from '@angular/common/http';
-import { Message } from '../../models/message';
+import { inject, Injectable } from '@angular/core';
+import {
+    HttpTransportType,
+    HubConnection,
+    HubConnectionBuilder,
+} from '@microsoft/signalr';
+import { BehaviorSubject } from 'rxjs';
+import { AUTH_KEY } from '../../interceptors/auth.interceptor';
+import { Chat, Message } from '../../models/message';
+import { CookieService } from '../cookie/cookie.service';
 
 const socketMessageTypes = {
     SEND_MESSAGE: 'sendMessage',
     RECEIVE_MESSAGE: 'receiveMessage',
-    UPDATE_ONLINE_USERS: 'updateOnlineUsers',
 };
 
 @Injectable({
     providedIn: 'root',
 })
 export class ChatService {
-    private readonly platformId = inject(PLATFORM_ID);
     private readonly httpClient = inject(HttpClient);
     private readonly cookieService = inject(CookieService);
-    private readonly userStore = inject(UserStore);
 
-    private readonly chatUrl = import.meta.env.NG_APP_WS_URL + '/chats';
+    private readonly messagesHubUrl =
+        import.meta.env.NG_APP_WS_URL + '/messages';
     private readonly messagesUrl = import.meta.env.NG_APP_API_URL + '/messages';
-
+    private readonly chatsUrl = import.meta.env.NG_APP_API_URL + '/chats';
     private connection!: HubConnection;
 
-    constructor() {
-        if (isPlatformServer(this.platformId)) {
-            return;
-        }
+    private readonly messages = new BehaviorSubject<Message[]>([]);
 
+    getChat(chatId: string) {
+        return this.httpClient.get<Chat>(this.chatsUrl + `/${chatId}`);
+    }
+
+    getAllByChat(chatId: string) {
+        return this.httpClient.get<Message[]>(this.messagesUrl + `/${chatId}`);
+    }
+
+    sendMessage(chatId: string, content: string) {
+        this.messages.next([
+            ...this.messages.value,
+            { chatId, content } as Message,
+        ]);
+
+        this.connection.send(socketMessageTypes.SEND_MESSAGE, {
+            chatId,
+            content,
+        });
+    }
+
+    getMessages() {
+        return this.messages.asObservable();
+    }
+
+    async connect() {
         this.connection = new HubConnectionBuilder()
-            .withUrl(this.chatUrl, {
+            .withUrl(this.messagesHubUrl, {
                 accessTokenFactory: () => {
                     return this.cookieService.get(AUTH_KEY) ?? '';
                 },
@@ -47,36 +66,19 @@ export class ChatService {
             .withAutomaticReconnect()
             .build();
 
-        this.connection
-            .start()
-            .then(() => {
-                console.log('Conexão iniciada com WebSocket!');
+        await this.connection.start();
 
-                this.connection.on(
-                    socketMessageTypes.RECEIVE_MESSAGE,
-                    console.log
-                );
-
-                this.connection.on(
-                    socketMessageTypes.UPDATE_ONLINE_USERS,
-                    (users) => {
-                        this.userStore.setLoggedInUsers(users);
-                    }
-                );
-            })
-            .catch((err) =>
-                console.error('Erro ao conectar:', this.chatUrl, err)
-            );
+        this.connection.on(
+            socketMessageTypes.RECEIVE_MESSAGE,
+            (message: Message) => {
+                this.messages.next([...this.messages.value, message]);
+            }
+        );
     }
 
-    getAllByChat(chatId: string) {
-        return this.httpClient.get<Message[]>(this.messagesUrl + `/${chatId}`);
-    }
-
-    sendMessage(chatId: string, content: string) {
-        return this.connection.send(socketMessageTypes.SEND_MESSAGE, {
-            chatId,
-            content,
-        });
+    async disconnect() {
+        if (this.connection) {
+            await this.connection.stop();
+        }
     }
 }

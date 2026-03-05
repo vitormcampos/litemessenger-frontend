@@ -11,9 +11,9 @@
 
     <div class="users-list">
         <h3>Usuários Online</h3>
-        @if (onlineUsers(); as users) {
+        @if (loggedInUsers(); as users) {
             <ul>
-                @for (user of onlineUsers(); track user.id) {
+                @for (user of users; track user.id) {
                     <li
                         class="user-item"
                         [class.active]="currentChatId() === user.id"

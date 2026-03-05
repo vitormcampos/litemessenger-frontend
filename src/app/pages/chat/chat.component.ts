@@ -8,16 +8,18 @@ import {
     ViewChild,
     ElementRef,
     AfterViewChecked,
+    PLATFORM_ID,
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformServer } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UserStore } from '../../stores/user/user.store';
 import { User } from '../../models/user';
-import { Message } from '../../models/message';
-import { map, tap } from 'rxjs';
-import { CurrentChatStore } from '../../stores/current-chat.store';
+import { Chat, Message } from '../../models/message';
+import { firstValueFrom, map, tap } from 'rxjs';
+import { CurrentChatStore } from '../../stores/current-chat/current-chat.store';
+import { ChatService } from '../../services/chat/chat.service';
 
 @Component({
     selector: 'app-chat',
@@ -28,6 +30,8 @@ import { CurrentChatStore } from '../../stores/current-chat.store';
 })
 export class ChatComponent implements OnInit, AfterViewChecked, OnDestroy {
     private readonly route = inject(ActivatedRoute);
+    private readonly platformId = inject(PLATFORM_ID);
+    private readonly chatService = inject(ChatService);
     private readonly userStore = inject(UserStore);
     private readonly currentChatStore = inject(CurrentChatStore);
 
@@ -43,22 +47,36 @@ export class ChatComponent implements OnInit, AfterViewChecked, OnDestroy {
         )
     );
 
-    messages = signal<Message[]>([]);
+    chat = computed(async () => {
+        const chatId = this.chatId();
+        if (!chatId) return null;
+
+        const chat = await firstValueFrom(this.chatService.getChat(chatId));
+        return chat;
+    });
+
+    otherUser = computed(() => {
+        const chat = this.chat();
+        const currentUserId = this.userStore.currentUser()?.id;
+        if (!chat || !currentUserId) return null;
+
+        return { id: '1', name: 'John Doe' }; // chat.participants.find((p) => p.id !== currentUserId) || null;
+    });
+
+    messages = toSignal(this.chatService.getMessages());
     newMessage = signal('');
-    isLoading = signal(true);
+    isLoading = signal(false);
 
     private shouldScrollToBottom = false;
 
     readonly currentUser = this.userStore.currentUser;
 
-    readonly otherUser = computed(() => {
-        const chatIdValue = this.chatId();
-        const users = this.userStore.loggedInUsers();
-        return users.find((u) => u.id === chatIdValue) || null;
-    });
+    async ngOnInit() {
+        if (isPlatformServer(this.platformId)) {
+            return;
+        }
 
-    ngOnInit() {
-        this.loadMessages();
+        await this.chatService.connect();
     }
 
     ngAfterViewChecked() {
@@ -68,15 +86,8 @@ export class ChatComponent implements OnInit, AfterViewChecked, OnDestroy {
         }
     }
 
-    ngOnDestroy() {}
-
-    private loadMessages() {
-        this.isLoading.set(true);
-
-        setTimeout(() => {
-            this.isLoading.set(false);
-            this.shouldScrollToBottom = true;
-        }, 300);
+    async ngOnDestroy() {
+        await this.chatService.disconnect();
     }
 
     sendMessage() {
@@ -93,9 +104,8 @@ export class ChatComponent implements OnInit, AfterViewChecked, OnDestroy {
             isRead: false,
         };
 
-        this.messages.update((msgs) => [...msgs, newMsg]);
+        this.chatService.sendMessage(newMsg.chatId, newMsg.content);
         this.newMessage.set('');
-        this.shouldScrollToBottom = true;
     }
 
     onKeyDown(event: KeyboardEvent) {
