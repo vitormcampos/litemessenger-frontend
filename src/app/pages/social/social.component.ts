@@ -1,13 +1,9 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { SidebarComponent } from '../../components/sidebar/sidebar.component';
-import { AuthService } from '../../services/auth/auth.service';
-import { ChatService } from '../../services/chat/chat.service';
-import { UserStore } from '../../stores/user/user.store';
+import { Component } from '@angular/core';
 
 @Component({
     selector: 'app-social',
     standalone: true,
-    imports: [SidebarComponent],
+    imports: [],
     templateUrl: './social.component.html',
     styleUrl: './social.component.css',
 })

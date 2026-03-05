@@ -123,6 +123,11 @@
     transform: translateX(4px);
 }
 
+.user-item.active > a {
+    background: var(--msn-aero);
+    color: white;
+}
+
 .user-avatar {
     width: 40px;
     height: 40px;

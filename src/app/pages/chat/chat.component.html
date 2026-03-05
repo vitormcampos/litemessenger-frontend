@@ -1,3 +1,178 @@
-<p>chat works!</p>
+<div class="chat-container">
+    @if (otherUser()) {
+        <div class="chat-header">
+            <div class="chat-user-info">
+                <div class="avatar">
+                    {{ getInitials(otherUser()) }}
+                </div>
+                <div class="user-details">
+                    <h3 class="user-name">{{ otherUser()?.name }}</h3>
+                    <span class="user-status">
+                        <span class="status-dot"></span>
+                        Online
+                    </span>
+                </div>
+            </div>
+            <div class="chat-actions">
+                <button class="icon-btn" title="Chamada de vídeo">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <polygon points="23 7 16 12 23 17 23 7"></polygon>
+                        <rect
+                            x="1"
+                            y="5"
+                            width="15"
+                            height="14"
+                            rx="2"
+                            ry="2"
+                        ></rect>
+                    </svg>
+                </button>
+                <button class="icon-btn" title="Mais opções">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <circle cx="12" cy="12" r="1"></circle>
+                        <circle cx="19" cy="12" r="1"></circle>
+                        <circle cx="5" cy="12" r="1"></circle>
+                    </svg>
+                </button>
+            </div>
+        </div>
 
-{{ chatId() }}
+        <div class="messages-container" #messagesContainer>
+            @if (isLoading()) {
+                <div class="loading-messages">
+                    <div class="spinner"></div>
+                    <p>Carregando mensagens...</p>
+                </div>
+            } @else {
+                @for (message of messages(); track message.id) {
+                    <div
+                        class="message-wrapper"
+                        [class.sent]="isFromCurrentUser(message)"
+                        [class.received]="!isFromCurrentUser(message)"
+                    >
+                        <div class="message-bubble">
+                            <p class="message-content">{{ message.content }}</p>
+                            <span class="message-time">{{
+                                formatTime(message.timestamp)
+                            }}</span>
+                        </div>
+                    </div>
+                } @empty {
+                    <div class="no-messages">
+                        <div class="empty-icon">
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="48"
+                                height="48"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+                                <path
+                                    d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                                ></path>
+                            </svg>
+                        </div>
+                        <p>Nenhuma mensagem ainda</p>
+                        <span>Envie uma mensagem para começar a conversa</span>
+                    </div>
+                }
+            }
+        </div>
+
+        <div class="message-input-container">
+            <button class="icon-btn attach-btn" title="Anexar arquivo">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <path
+                        d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"
+                    ></path>
+                </svg>
+            </button>
+            <div class="input-wrapper">
+                <textarea
+                    [(ngModel)]="newMessage"
+                    (keydown)="onKeyDown($event)"
+                    placeholder="Digite uma mensagem..."
+                    rows="1"
+                ></textarea>
+            </div>
+            <button
+                class="send-btn"
+                (click)="sendMessage()"
+                [disabled]="!newMessage().trim()"
+            >
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
+        </div>
+    } @else {
+        <div class="no-chat-selected">
+            <div class="empty-icon">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="64"
+                    height="64"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <path
+                        d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                    ></path>
+                </svg>
+            </div>
+            <h2>Bem-vindo ao Chat</h2>
+            <p>
+                Selecione um contato na barra lateral para começar a conversar
+            </p>
+        </div>
+    }
+</div>
