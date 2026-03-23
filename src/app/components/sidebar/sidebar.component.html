@@ -10,7 +10,12 @@
     </div>
 
     <div class="users-list">
-        <h3>Usuários Online</h3>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="m-0">Contatos</h3>
+            <button class="btn btn-sm" (click)="addContact()">
+                Add. contato
+            </button>
+        </div>
         @if (loggedInUsers(); as users) {
             <ul>
                 @for (user of users; track user.id) {

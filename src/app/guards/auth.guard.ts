@@ -18,7 +18,7 @@ export const authGuard: CanActivateFn = (route, state) => {
                 userStore.setCurrentUser(user);
             },
             error: () => {
-                cookieService.remove(AUTH_KEY);
+                //cookieService.remove(AUTH_KEY);
                 router.navigate(['/login']);
             },
         });

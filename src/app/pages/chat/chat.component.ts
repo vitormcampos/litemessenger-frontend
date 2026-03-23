@@ -19,6 +19,7 @@ import { User } from '../../models/user';
 import { Chat, Message } from '../../models/message';
 import { firstValueFrom, map, tap } from 'rxjs';
 import { CurrentChatStore } from '../../stores/current-chat/current-chat.store';
+import { MessageService } from '../../services/message/message.service';
 import { ChatService } from '../../services/chat/chat.service';
 
 @Component({
@@ -31,6 +32,7 @@ import { ChatService } from '../../services/chat/chat.service';
 export class ChatComponent implements OnInit, AfterViewChecked, OnDestroy {
     private readonly route = inject(ActivatedRoute);
     private readonly platformId = inject(PLATFORM_ID);
+    private readonly messageService = inject(MessageService);
     private readonly chatService = inject(ChatService);
     private readonly userStore = inject(UserStore);
     private readonly currentChatStore = inject(CurrentChatStore);
@@ -39,28 +41,17 @@ export class ChatComponent implements OnInit, AfterViewChecked, OnDestroy {
     messagesContainer!: ElementRef<HTMLDivElement>;
 
     chatId = toSignal(
-        this.route.paramMap.pipe(
-            map((params) => params.get('id')),
-            tap((chatId) => {
-                this.currentChatStore.setCurrentChatId(chatId);
-            })
-        )
+        this.route.paramMap.pipe(map((params) => params.get('id')))
     );
 
-    chat = computed(async () => {
-        const chatId = this.chatId();
-        if (!chatId) return null;
-
-        const chat = await firstValueFrom(this.chatService.getChat(chatId));
-        return chat;
-    });
+    chat = signal(null as Chat | null);
 
     otherUser = computed(() => {
         const chat = this.chat();
         const currentUserId = this.userStore.currentUser()?.id;
         if (!chat || !currentUserId) return null;
 
-        return { id: '1', name: 'John Doe' }; // chat.participants.find((p) => p.id !== currentUserId) || null;
+        return chat.users.find((p) => p.id !== currentUserId) || null;
     });
 
     messages = toSignal(this.chatService.getMessages());
@@ -76,7 +67,15 @@ export class ChatComponent implements OnInit, AfterViewChecked, OnDestroy {
             return;
         }
 
-        await this.chatService.connect();
+        const chatId = this.chatId();
+        console.log('Chat ID:', chatId);
+        if (chatId) {
+            const chat = await firstValueFrom(this.chatService.getChat(chatId));
+            this.chat.set(chat);
+            this.currentChatStore.setCurrentChat(chat);
+        }
+
+        await this.messageService.connect();
     }
 
     ngAfterViewChecked() {
@@ -87,24 +86,14 @@ export class ChatComponent implements OnInit, AfterViewChecked, OnDestroy {
     }
 
     async ngOnDestroy() {
-        await this.chatService.disconnect();
+        await this.messageService.disconnect();
     }
 
     sendMessage() {
         const content = this.newMessage().trim();
         if (!content) return;
 
-        const newMsg: Message = {
-            id: Date.now().toString(),
-            chatId: this.chatId() || '',
-            senderId: this.currentUser()?.id || '',
-            receiverId: this.otherUser()?.id || '',
-            content: content,
-            timestamp: new Date(),
-            isRead: false,
-        };
-
-        this.chatService.sendMessage(newMsg.chatId, newMsg.content);
+        this.messageService.sendMessage(this.chatId() || '', content);
         this.newMessage.set('');
     }
 
@@ -126,7 +115,7 @@ export class ChatComponent implements OnInit, AfterViewChecked, OnDestroy {
     }
 
     formatTime(date: Date): string {
-        return new Date(date).toLocaleTimeString('pt-BR', {
+        return date.toLocaleTimeString('pt-BR', {
             hour: '2-digit',
             minute: '2-digit',
         });

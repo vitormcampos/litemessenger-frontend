@@ -1,3 +1,5 @@
+import { User } from './user';
+
 export interface Message {
     id: string;
     chatId: string;
@@ -10,7 +12,7 @@ export interface Message {
 
 export interface Chat {
     id: string;
-    participants: string[];
+    users: User[];
     lastMessage?: Message;
     updatedAt: Date;
 }
