@@ -7,10 +7,13 @@ RUN npm ci
 
 COPY . .
 
-ARG NG_APP_API_URL=http://localhost:5000
-ARG NG_APP_WS_URL=http://localhost:5000
+ARG NG_APP_API_URL=http://backend:8080/api
+ARG NG_APP_WS_URL=http://backend:8080
 
-RUN npm run build
+ENV NG_APP_API_URL=$NG_APP_API_URL
+ENV NG_APP_WS_URL=$NG_APP_WS_URL
+
+RUN npm run build -- --configuration production
 
 FROM node:20-alpine AS runner
 WORKDIR /app
