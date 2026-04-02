@@ -1,6 +1,6 @@
 <aside class="sidebar">
     <div class="user-profile">
-        <div class="avatar">
+        <div class="avatar online">
             {{ username().charAt(0).toUpperCase() }}
         </div>
         <div class="user-info">
@@ -16,24 +16,32 @@
                 Add. contato
             </button>
         </div>
-        @if (loggedInUsers(); as users) {
-            <ul>
-                @for (user of users; track user.id) {
-                    <li
-                        class="user-item"
-                        [class.active]="currentChatId() === user.id"
-                    >
-                        <a routerLink="/chat/{{ user.id }}">
-                            <div class="user-avatar">
-                                {{ (user.name || '').charAt(0).toUpperCase() }}
-                            </div>
-                            <span class="user-name">{{ user.name }}</span>
-                        </a>
-                    </li>
+        <ul>
+            @for (chat of chats(); track chat.id) {
+                @for (user of chat.users; track user.id) {
+                    @if (user.id !== currentUser()?.id) {
+                        <li
+                            class="user-item"
+                            [class.active]="currentChatId() === user.id"
+                        >
+                            <a routerLink="/chat/{{ chat.id }}">
+                                <div
+                                    class="user-avatar"
+                                    [class.online]="user.status === 1"
+                                    [class.offline]="user.status !== 1"
+                                >
+                                    {{
+                                        (user.name || '')
+                                            .charAt(0)
+                                            .toUpperCase()
+                                    }}
+                                </div>
+                                <span class="user-name">{{ user.name }}</span>
+                            </a>
+                        </li>
+                    }
                 }
-            </ul>
-        } @else {
-            <p class="no-users">Nenhum usuário online</p>
-        }
+            }
+        </ul>
     </div>
 </aside>

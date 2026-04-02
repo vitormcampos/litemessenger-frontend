@@ -23,6 +23,10 @@ export class ChatService {
         });
     }
 
+    getChats() {
+        return this.httpClient.get<Chat[]>(this.chatsUrl);
+    }
+
     getMessages() {
         return this.messages.asObservable();
     }

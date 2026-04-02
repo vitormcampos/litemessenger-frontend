@@ -5,14 +5,16 @@ import {
     OnDestroy,
     OnInit,
     PLATFORM_ID,
+    signal,
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
 import { UserStore } from '../../stores/user/user.store';
 import { CurrentChatStore } from '../../stores/current-chat/current-chat.store';
 import { UserStatusService } from '../../services/user-status/user-status.service';
-import { filter, map } from 'rxjs';
+import { filter, interval, map, switchMap, timer } from 'rxjs';
 import { ChatService } from '../../services/chat/chat.service';
+import { Chat } from '../../models/message';
 
 @Component({
     selector: 'app-sidebar',
@@ -21,37 +23,42 @@ import { ChatService } from '../../services/chat/chat.service';
     templateUrl: './sidebar.component.html',
     styleUrl: './sidebar.component.css',
 })
-export class SidebarComponent implements OnInit, OnDestroy {
+export class SidebarComponent implements OnInit {
     private readonly platformId = inject(PLATFORM_ID);
     private readonly router = inject(Router);
-    private readonly userStatusService = inject(UserStatusService);
     private readonly userStore = inject(UserStore);
     private readonly currentChatStore = inject(CurrentChatStore);
     private readonly chatService = inject(ChatService);
+    private readonly userStatusService = inject(UserStatusService);
 
     readonly currentChatId = this.currentChatStore.currentChatId;
     readonly currentUser = this.userStore.currentUser;
     readonly username = this.userStore.username;
 
-    loggedInUsers = toSignal(
-        this.userStatusService
-            .getLoggedInUsers()
-            .pipe(
-                map((users) =>
-                    users.filter((u) => u.id !== this.currentUser()?.id)
-                )
-            )
-    );
+    readonly chats = signal<Chat[]>([]);
 
-    async ngOnInit(): Promise<void> {
+    ngOnInit() {
         if (isPlatformServer(this.platformId)) {
             return;
         }
 
-        await this.userStatusService.connect();
-    }
-    async ngOnDestroy(): Promise<void> {
-        await this.userStatusService.disconnect();
+        timer(0, 10000)
+            .pipe(
+                filter(() => this.userStore.isLoggedIn()),
+                switchMap(() => this.chatService.getChats())
+            )
+            .subscribe({
+                next: (chats) => {
+                    this.chats.set(chats);
+                },
+                error: (err) => {
+                    console.error('Failed to fetch chats:', err);
+                },
+            });
+
+        this.userStatusService.connect().catch((err) => {
+            console.error('Failed to connect to user status service:', err);
+        });
     }
 
     addContact() {

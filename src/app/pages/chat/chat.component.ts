@@ -89,11 +89,11 @@ export class ChatComponent implements OnInit, AfterViewChecked, OnDestroy {
         await this.messageService.disconnect();
     }
 
-    sendMessage() {
+    async sendMessage() {
         const content = this.newMessage().trim();
         if (!content) return;
 
-        this.messageService.sendMessage(this.chatId() || '', content);
+        await this.messageService.sendMessage(this.chatId() || '', content);
         this.newMessage.set('');
     }
 

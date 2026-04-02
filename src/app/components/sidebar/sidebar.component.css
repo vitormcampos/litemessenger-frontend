@@ -34,6 +34,19 @@
     font-weight: 600;
     color: white;
     box-shadow: 0 4px 12px rgba(0, 161, 228, 0.3);
+    position: relative;
+}
+
+.avatar.online::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--msn-green);
+    border: 3px solid rgba(255, 255, 255, 0.85);
 }
 
 .user-info {
@@ -139,6 +152,31 @@
     font-size: 14px;
     font-weight: 600;
     color: white;
+    position: relative;
+}
+
+.user-avatar.online::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--msn-green);
+    border: 2px solid rgba(255, 255, 255, 0.85);
+}
+
+.user-avatar.offline::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #9ca3af;
+    border: 2px solid rgba(255, 255, 255, 0.85);
 }
 
 .user-name {

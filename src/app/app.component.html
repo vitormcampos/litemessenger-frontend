@@ -1,5 +1,7 @@
 <div class="social-container">
-    <app-sidebar />
+    @if (isLoggedIn()) {
+        <app-sidebar />
+    }
     <main class="social-content">
         <router-outlet />
     </main>

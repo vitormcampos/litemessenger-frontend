@@ -11,8 +11,8 @@ import { Chat, Message } from '../../models/message';
 import { CookieService } from '../cookie/cookie.service';
 
 const socketMessageTypes = {
-    SEND_MESSAGE: 'sendMessage',
-    RECEIVE_MESSAGE: 'receiveMessage',
+    SEND_MESSAGE: 'SendMessage',
+    RECEIVE_MESSAGE: 'ReceiveMessage',
 };
 
 @Injectable({
@@ -27,8 +27,8 @@ export class MessageService {
 
     private readonly messages = new BehaviorSubject<Message[]>([]);
 
-    sendMessage(chatId: string, content: string) {
-        this.connection.send(socketMessageTypes.SEND_MESSAGE, {
+    async sendMessage(chatId: string, content: string) {
+        await this.connection.send(socketMessageTypes.SEND_MESSAGE, {
             chatId,
             content,
         });
