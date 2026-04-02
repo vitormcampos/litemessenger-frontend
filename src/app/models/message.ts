@@ -3,8 +3,7 @@ import { User } from './user';
 export interface Message {
     id: string;
     chatId: string;
-    senderId: string;
-    receiverId: string;
+    userId: string;
     content: string;
     timestamp: Date;
     isRead: boolean;

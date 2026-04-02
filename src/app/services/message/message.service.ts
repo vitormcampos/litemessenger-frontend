@@ -13,6 +13,8 @@ import { CookieService } from '../cookie/cookie.service';
 const socketMessageTypes = {
     SEND_MESSAGE: 'SendMessage',
     RECEIVE_MESSAGE: 'ReceiveMessage',
+    JOIN_CHAT: 'JoinChat',
+    LEAVE_CHAT: 'LeaveChat',
 };
 
 @Injectable({
@@ -28,10 +30,23 @@ export class MessageService {
     private readonly messages = new BehaviorSubject<Message[]>([]);
 
     async sendMessage(chatId: string, content: string) {
-        await this.connection.send(socketMessageTypes.SEND_MESSAGE, {
+        await this.connection.send(
+            socketMessageTypes.SEND_MESSAGE,
             chatId,
-            content,
-        });
+            content
+        );
+    }
+
+    async joinChat(chatId: string) {
+        await this.connection.send(socketMessageTypes.JOIN_CHAT, chatId);
+    }
+
+    async leaveChat(chatId: string) {
+        await this.connection.send(socketMessageTypes.LEAVE_CHAT, chatId);
+    }
+
+    getMessages() {
+        return this.messages.asObservable();
     }
 
     async connect() {

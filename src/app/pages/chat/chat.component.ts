@@ -54,7 +54,9 @@ export class ChatComponent implements OnInit, AfterViewChecked, OnDestroy {
         return chat.users.find((p) => p.id !== currentUserId) || null;
     });
 
-    messages = toSignal(this.chatService.getMessages());
+    messages = toSignal(
+        this.messageService.getMessages().pipe(tap(console.log))
+    );
     newMessage = signal('');
     isLoading = signal(false);
 
@@ -68,7 +70,6 @@ export class ChatComponent implements OnInit, AfterViewChecked, OnDestroy {
         }
 
         const chatId = this.chatId();
-        console.log('Chat ID:', chatId);
         if (chatId) {
             const chat = await firstValueFrom(this.chatService.getChat(chatId));
             this.chat.set(chat);
@@ -76,6 +77,9 @@ export class ChatComponent implements OnInit, AfterViewChecked, OnDestroy {
         }
 
         await this.messageService.connect();
+        if (chatId) {
+            await this.messageService.joinChat(chatId);
+        }
     }
 
     ngAfterViewChecked() {
@@ -86,6 +90,10 @@ export class ChatComponent implements OnInit, AfterViewChecked, OnDestroy {
     }
 
     async ngOnDestroy() {
+        const chatId = this.chatId();
+        if (chatId) {
+            await this.messageService.leaveChat(chatId);
+        }
         await this.messageService.disconnect();
     }
 
@@ -114,15 +122,15 @@ export class ChatComponent implements OnInit, AfterViewChecked, OnDestroy {
             .substring(0, 2);
     }
 
-    formatTime(date: Date): string {
-        return date.toLocaleTimeString('pt-BR', {
+    formatTime(date: string): string {
+        return new Date(date).toLocaleTimeString('pt-BR', {
             hour: '2-digit',
             minute: '2-digit',
         });
     }
 
     isFromCurrentUser(message: Message): boolean {
-        return message.senderId === this.currentUser()?.id;
+        return message.userId === this.currentUser()?.id;
     }
 
     private scrollToBottom() {

@@ -72,9 +72,9 @@
                     >
                         <div class="message-bubble">
                             <p class="message-content">{{ message.content }}</p>
-                            <span class="message-time">{{
-                                formatTime(message.timestamp)
-                            }}</span>
+                            <span class="message-time">
+                                {{ formatTime(message.timestamp) }}
+                            </span>
                         </div>
                     </div>
                 } @empty {
