@@ -1,13 +1,12 @@
-import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import {
     HttpTransportType,
     HubConnection,
     HubConnectionBuilder,
 } from '@microsoft/signalr';
-import { BehaviorSubject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { AUTH_KEY } from '../../interceptors/auth.interceptor';
-import { Chat, Message } from '../../models/message';
+import { Message } from '../../models/message';
 import { CookieService } from '../cookie/cookie.service';
 
 const socketMessageTypes = {
@@ -27,7 +26,11 @@ export class MessageService {
         import.meta.env.NG_APP_WS_URL + '/messages';
     private connection!: HubConnection;
 
-    private readonly messages = new BehaviorSubject<Message[]>([]);
+    private readonly newMessage$ = new Subject<Message>();
+
+    get newMessages() {
+        return this.newMessage$.asObservable();
+    }
 
     async sendMessage(chatId: string, content: string) {
         await this.connection.send(
@@ -43,10 +46,6 @@ export class MessageService {
 
     async leaveChat(chatId: string) {
         await this.connection.send(socketMessageTypes.LEAVE_CHAT, chatId);
-    }
-
-    getMessages() {
-        return this.messages.asObservable();
     }
 
     async connect() {
@@ -66,7 +65,7 @@ export class MessageService {
         this.connection.on(
             socketMessageTypes.RECEIVE_MESSAGE,
             (message: Message) => {
-                this.messages.next([...this.messages.value, message]);
+                this.newMessage$.next(message);
             }
         );
     }

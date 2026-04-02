@@ -17,6 +17,10 @@ export class ChatService {
         return this.httpClient.get<Chat>(this.chatsUrl + `/${chatId}`);
     }
 
+    getMessages(chatId: string) {
+        return this.httpClient.get<Message[]>(this.chatsUrl + `/${chatId}/messages`);
+    }
+
     createChat(participantEmail: string) {
         return this.httpClient.post<Chat>(this.chatsUrl, {
             userEmail: participantEmail,
@@ -27,7 +31,15 @@ export class ChatService {
         return this.httpClient.get<Chat[]>(this.chatsUrl);
     }
 
-    getMessages() {
+    getMessagesObservable() {
         return this.messages.asObservable();
+    }
+
+    updateMessages(messages: Message[]) {
+        this.messages.next(messages);
+    }
+
+    addMessage(message: Message) {
+        this.messages.next([...this.messages.value, message]);
     }
 }

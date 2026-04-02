@@ -123,7 +123,8 @@
             </button>
             <div class="input-wrapper">
                 <textarea
-                    [(ngModel)]="newMessage"
+                    [ngModel]="newMessage()"
+                    (ngModelChange)="newMessage.set($event)"
                     (keydown)="onKeyDown($event)"
                     placeholder="Digite uma mensagem..."
                     rows="1"
